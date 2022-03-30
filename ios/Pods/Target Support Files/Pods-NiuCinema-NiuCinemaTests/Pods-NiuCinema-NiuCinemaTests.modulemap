@@ -1,0 +1,6 @@
+module Pods_NiuCinema_NiuCinemaTests {
+  umbrella header "Pods-NiuCinema-NiuCinemaTests-umbrella.h"
+
+  export *
+  module * { export * }
+}

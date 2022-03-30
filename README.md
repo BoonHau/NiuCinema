@@ -1,0 +1,2 @@
+# NiuCinema
+ A demo application
