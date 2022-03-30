@@ -1,5 +1,6 @@
 import {Provider} from 'react-redux';
 import React from 'react';
+import 'react-native-gesture-handler';
 import {store} from './src/redux/store';
 import {Navigation} from './src/shared/navigation';
 import {useColorScheme} from './src/shared/hook';
