@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -9,10 +9,10 @@
 
 #include <folly/Executor.h>
 #include <folly/io/async/EventBase.h>
-#include <rsocket/RSocket.h>
 #include <mutex>
 #include "FlipperConnectionManager.h"
 #include "FlipperInitConfig.h"
+#include "FlipperSocket.h"
 #include "FlipperState.h"
 
 namespace facebook {
@@ -21,9 +21,7 @@ namespace flipper {
 class ConnectionEvents;
 class ConnectionContextStore;
 class FlipperRSocketResponder;
-
-rsocket::Payload toRSocketPayload(folly::dynamic data);
-
+class FlipperConnectionManagerWrapper;
 class FlipperConnectionManagerImpl : public FlipperConnectionManager {
   friend ConnectionEvents;
 
@@ -63,21 +61,30 @@ class FlipperConnectionManagerImpl : public FlipperConnectionManager {
   std::shared_ptr<FlipperState> flipperState_;
   int insecurePort;
   int securePort;
+  int altInsecurePort;
+  int altSecurePort;
 
   folly::EventBase* flipperEventBase_;
   folly::EventBase* connectionEventBase_;
-  std::unique_ptr<rsocket::RSocketClient> client_;
+
+  std::unique_ptr<FlipperSocket> client_;
+
   bool connectionIsTrusted_;
+  bool certificateExchangeCompleted_ = false;
+
   int failedConnectionAttempts_ = 0;
+  int failedSocketConnectionAttempts = 0;
+
   std::shared_ptr<ConnectionContextStore> contextStore_;
+  std::shared_ptr<FlipperConnectionManagerWrapper> implWrapper_;
 
   void startSync();
-  bool doCertificateExchange();
+  bool connectAndExchangeCertificate();
   bool connectSecurely();
   bool isCertificateExchangeNeeded();
   void requestSignedCertFromFlipper();
   bool isRunningInOwnThread();
-  void sendLegacyCertificateRequest(folly::dynamic message);
+  void reevaluateSocketProvider();
   std::string getDeviceId();
 };
 

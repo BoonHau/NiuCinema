@@ -1,5 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
-import {ScrollView, StyleSheet, TextInput as RNTextInput} from 'react-native';
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  TextInput as RNTextInput,
+} from 'react-native';
 import React, {useRef, useState} from 'react';
 import {
   Button,
@@ -9,18 +14,29 @@ import {
   View,
 } from '../../shared/components/ui';
 import {Colors, Layout} from '../../shared/constants';
-import {useColorScheme} from '../../shared/hook';
+import {useColorScheme, useDidMountEffect} from '../../shared/hook';
 import {StackScreenProps} from '@react-navigation/stack';
 import {AuthenticationStackParamList} from '../../shared/navigation';
+import {getUserLoginValidation} from '../../utils';
+import {useAppDispatch, useAppSelector} from '../../shared/hook/useApp';
+import signUpWithUsernameAndPassword from '../../services/signUpWithUsernameAndPassword';
+import {ActionTypes, firebaseAuthActions} from '../../redux';
+import {batch} from 'react-redux';
 
 export type SignUpScreenProps = StackScreenProps<
   AuthenticationStackParamList,
   'LoginScreen'
 >;
 
-const SignUpScreen = ({}: SignUpScreenProps) => {
+const SignUpScreen = ({navigation}: SignUpScreenProps) => {
   // Variable that holds useColorScheme hook
   const colorScheme = useColorScheme();
+
+  // Variable that holds useAppDispatch hook
+  const dispatch = useAppDispatch();
+
+  // Variable that holds login status
+  const firebaseAuth = useAppSelector(state => state.firebaseAuth);
 
   // Common variables
   // Value that holds scroll view reference
@@ -33,8 +49,8 @@ const SignUpScreen = ({}: SignUpScreenProps) => {
   const refTextInputConfirmPassword = useRef<RNTextInput>(null);
 
   // State management
-  // useState that holds value of email
-  const [strEmail, setEmail] = useState<string | undefined>(undefined);
+  // useState that holds value of username
+  const [strUsername, setUsername] = useState<string | undefined>(undefined);
 
   // useState that holds value of password
   const [strPassword, setPassword] = useState<string | undefined>(undefined);
@@ -51,6 +67,60 @@ const SignUpScreen = ({}: SignUpScreenProps) => {
   const [focus, setFocus] = useState<
     'email' | 'password' | 'confirm-password' | undefined
   >(undefined);
+
+  // useEffect management
+  // useDidMountEffect that only tracks when the first render is done
+  useDidMountEffect(() => {
+    // Firebase authentication state handler
+    switch (firebaseAuth.status) {
+      // Api status is pending
+      case ActionTypes.REQUEST_PENDING:
+        // Show loading indicator when calling api
+        setLoading(true);
+        break;
+
+      // Api status is failure
+      case ActionTypes.REQUEST_FAILED:
+        // Displau error message
+        Alert.alert(
+          'Error',
+          firebaseAuth.error?.message ??
+            'Ops! Something went wrong. Please try later',
+        );
+
+        // Modify state in a single render update
+        batch(() => {
+          // Dismiss loading indicator when calling api
+          setLoading(false);
+
+          // Reset firebase auth status
+          dispatch(firebaseAuthActions.reset());
+        });
+
+        break;
+
+      // Api status is succeded
+      case ActionTypes.REQUEST_SUCCEEDED:
+        // Clear navigation stack and navigate to movie list screen
+        navigation.getParent()?.reset({
+          index: 0,
+          routes: [{name: 'MovieListScreen'}],
+        });
+
+        // Modify state in a single render update
+        batch(() => {
+          // Dismiss loading indicator when calling api
+          setLoading(false);
+
+          // Reset firebase auth status
+          dispatch(firebaseAuthActions.reset());
+        });
+        break;
+
+      default:
+        break;
+    }
+  }, [firebaseAuth.user, firebaseAuth.error]);
 
   return (
     <SafeAreaView
@@ -82,15 +152,16 @@ const SignUpScreen = ({}: SignUpScreenProps) => {
               },
             ]}>
             <TextInput
-              placeholder="Email"
+              placeholder="Username"
               medium
               autoCorrect={false}
               keyboardType="email-address"
               returnKeyType="next"
+              autoCapitalize="none"
               selectionColor={Colors.primaryColor}
-              defaultValue={strEmail}
+              defaultValue={strUsername}
               onSubmitEditing={() => refTextInputPassword.current?.focus()}
-              onChangeText={text => setEmail(text)}
+              onChangeText={text => setUsername(text)}
               onFocus={() => setFocus('email')}
               onBlur={() => setFocus(undefined)}
               style={[
@@ -115,6 +186,7 @@ const SignUpScreen = ({}: SignUpScreenProps) => {
               medium
               secureTextEntry
               returnKeyType="next"
+              autoCapitalize="none"
               selectionColor={Colors.primaryColor}
               defaultValue={strPassword}
               onSubmitEditing={() =>
@@ -147,6 +219,7 @@ const SignUpScreen = ({}: SignUpScreenProps) => {
               medium
               secureTextEntry
               returnKeyType="done"
+              autoCapitalize="none"
               selectionColor={Colors.primaryColor}
               defaultValue={strConfirmPassword}
               onChangeText={text => setConfirmPassword(text)}
@@ -175,10 +248,39 @@ const SignUpScreen = ({}: SignUpScreenProps) => {
             style: Layout.button.default,
           }}
           onPress={() => {
-            setLoading(true);
-            setTimeout(() => {
-              setLoading(false);
-            }, 3000);
+            // Check user login validation
+            const result = getUserLoginValidation(strUsername, strPassword);
+            switch (result.success) {
+              // Valid inputs handler
+              case true:
+                if (strPassword === strConfirmPassword) {
+                  strUsername && strPassword
+                    ? dispatch(
+                        signUpWithUsernameAndPassword({
+                          username: strUsername,
+                          password: strPassword,
+                        }),
+                      )
+                    : Alert.alert(
+                        'Error',
+                        'Ops! Something went wrong. Please try later.',
+                      );
+                } else {
+                  Alert.alert(
+                    'Error',
+                    'The password and confirm password does not match',
+                  );
+                }
+                break;
+              // Invalid inputs handler
+              default:
+                Alert.alert(
+                  'Error',
+                  result.message ??
+                    'Ops! Something went wrong. Please try later.',
+                );
+                break;
+            }
           }}
         />
       </View>

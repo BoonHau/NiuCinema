@@ -46,7 +46,14 @@ const AuthenticationScreen = ({navigation}: AuthenticationScreenProps) => {
             },
           }}
           containerProps={{style: Layout.button.default}}
-          onPress={() => navigation.navigate('LoginScreen')}
+          onPress={() => {
+            // navigation.navigate('LoginScreen');
+            // Clear navigation stack and navigate to movie list screen
+            navigation.getParent()?.reset({
+              index: 0,
+              routes: [{name: 'MovieListScreen'}],
+            });
+          }}
         />
         <Button
           title="Sign up"

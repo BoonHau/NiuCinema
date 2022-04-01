@@ -51,7 +51,7 @@ static void InitializeFlipper(UIApplication *application) {
 
   // To allow Firebase on iOS to use the credentials
   // https://rnfirebase.io/
-  [FIRApp configure]
+  [FIRApp configure];
 
   return YES;
 }

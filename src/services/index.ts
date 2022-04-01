@@ -1,3 +1,9 @@
-import signInFirebaseWithEmailAndPassword from './signInFirebaseWithEmailAndPassword';
+import signInWithUsernameAndPassword from './signInWithUsernameAndPassword';
+import signUpWithUsernameAndPassword from './signUpWithUsernameAndPassword';
+import getMovies from './getMovies';
 
-export {signInFirebaseWithEmailAndPassword};
+export {
+  signInWithUsernameAndPassword,
+  signUpWithUsernameAndPassword,
+  getMovies,
+};

@@ -1,10 +1,13 @@
-import {Provider} from 'react-redux';
 import React from 'react';
+import {LogBox} from 'react-native';
+import {Provider} from 'react-redux';
 import 'react-native-gesture-handler';
-import {store} from './src/redux/store';
 import {Navigation} from './src/shared/navigation';
 import {useColorScheme} from './src/shared/hook';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {store} from './src/redux/store';
+
+LogBox.ignoreLogs(['new NativeEventEmitter']);
 
 const App = () => {
   // Variable that holds color scheme

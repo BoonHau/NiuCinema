@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -10,18 +10,20 @@
 #import "FlipperClient.h"
 #import <Flipper/FlipperCertificateProvider.h>
 #import <Flipper/FlipperClient.h>
+#import <Flipper/FlipperSocketProvider.h>
 #include <folly/io/async/EventBase.h>
 #include <folly/io/async/ScopedEventBaseThread.h>
 #include <memory>
 #import "FlipperClient+Testing.h"
 #import "FlipperCppWrapperPlugin.h"
 #import "FlipperKitCertificateProvider.h"
+#import "FlipperWebSocket.h"
 #import "SKEnvironmentVariables.h"
 #include "SKStateUpdateCPPWrapper.h"
 
 #if !TARGET_OS_OSX
 #import <UIKit/UIKit.h>
-#if !TARGET_OS_SIMULATOR
+#if !TARGET_OS_SIMULATOR && !TARGET_OS_MACCATALYST
 #import <FKPortForwarding/FKPortForwardingServer.h>
 #endif
 #endif
@@ -33,7 +35,7 @@ using WrapperPlugin = facebook::flipper::FlipperCppWrapperPlugin;
   folly::ScopedEventBaseThread sonarThread;
   folly::ScopedEventBaseThread connectionThread;
   id<FlipperKitCertificateProvider> _certProvider;
-#if !TARGET_OS_OSX && !TARGET_OS_SIMULATOR
+#if !TARGET_OS_OSX && !TARGET_OS_SIMULATOR && !TARGET_OS_MACCATALYST
   FKPortForwardingServer* _secureServer;
   FKPortForwardingServer* _insecureServer;
 #endif
@@ -72,7 +74,11 @@ using WrapperPlugin = facebook::flipper::FlipperCppWrapperPlugin;
     NSString* deviceOS;
     NSString* deviceName;
 #if !TARGET_OS_OSX
+#if !TARGET_OS_MACCATALYST
     deviceOS = @"iOS";
+#else
+    deviceOS = @"MacOS";
+#endif
     deviceName = [[UIDevice currentDevice] name];
 #if TARGET_OS_SIMULATOR
     deviceName = [NSString stringWithFormat:@"%@ %@",
@@ -99,8 +105,14 @@ using WrapperPlugin = facebook::flipper::FlipperCppWrapperPlugin;
            sonarThread.getEventBase(),
            connectionThread.getEventBase(),
            [SKEnvironmentVariables getInsecurePort],
-           [SKEnvironmentVariables getSecurePort]});
+           [SKEnvironmentVariables getSecurePort],
+           [SKEnvironmentVariables getAltInsecurePort],
+           [SKEnvironmentVariables getAltSecurePort]});
       _cppClient = facebook::flipper::FlipperClient::instance();
+
+      facebook::flipper::FlipperSocketProvider::setDefaultProvider(
+          std::make_unique<facebook::flipper::FlipperWebSocketProvider>());
+
     } catch (const std::system_error& e) {
       // Probably ran out of disk space.
       return nil;
@@ -143,20 +155,20 @@ using WrapperPlugin = facebook::flipper::FlipperCppWrapperPlugin;
 }
 
 - (void)start {
-#if !TARGET_OS_OSX && !TARGET_OS_SIMULATOR
+#if !TARGET_OS_OSX && !TARGET_OS_SIMULATOR && !TARGET_OS_MACCATALYST
   _secureServer = [FKPortForwardingServer new];
-  [_secureServer forwardConnectionsFromPort:8088];
-  [_secureServer listenForMultiplexingChannelOnPort:8078];
+  [_secureServer forwardConnectionsFromPort:9088];
+  [_secureServer listenForMultiplexingChannelOnPort:9078];
   _insecureServer = [FKPortForwardingServer new];
-  [_insecureServer forwardConnectionsFromPort:8089];
-  [_insecureServer listenForMultiplexingChannelOnPort:8079];
+  [_insecureServer forwardConnectionsFromPort:9089];
+  [_insecureServer listenForMultiplexingChannelOnPort:9079];
 #endif
   _cppClient->start();
 }
 
 - (void)stop {
   _cppClient->stop();
-#if !TARGET_OS_OSX && !TARGET_OS_SIMULATOR
+#if !TARGET_OS_OSX && !TARGET_OS_SIMULATOR && !TARGET_OS_MACCATALYST
   [_secureServer close];
   _secureServer = nil;
   [_insecureServer close];

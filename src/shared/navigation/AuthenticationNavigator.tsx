@@ -64,15 +64,15 @@ export const AuthenticationNavigator = () => {
         }}
       />
       <AuthenticationStack.Screen
-        name="SignUpScreen"
-        component={SignUpScreen}
+        name="LoginScreen"
+        component={LoginScreen}
         options={{
           headerShown: true,
         }}
       />
       <AuthenticationStack.Screen
-        name="LoginScreen"
-        component={LoginScreen}
+        name="SignUpScreen"
+        component={SignUpScreen}
         options={{
           headerShown: true,
         }}

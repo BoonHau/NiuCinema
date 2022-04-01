@@ -1,12 +1,15 @@
 import {createStackNavigator} from '@react-navigation/stack';
 import React from 'react';
-import {SplashScreen} from '../../screens';
+import {MovieListScreen, SplashScreen} from '../../screens';
+import MovieDetailsScreen from '../../screens/MovieDetailsScreen';
 import {AuthenticationNavigator} from './AuthenticationNavigator';
 // import {useColorScheme} from '../hook';
 
 export type RootStackParamList = {
   SplashScreen: undefined;
   AuthenticationNavigator: undefined;
+  MovieListScreen: undefined;
+  MovieDetailsScreen: undefined;
 };
 
 // A root stack navigator is used for displaying modals on top of all other content
@@ -27,6 +30,20 @@ export const RootNavigator = () => {
       <RootStack.Screen
         name="AuthenticationNavigator"
         component={AuthenticationNavigator}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <RootStack.Screen
+        name="MovieListScreen"
+        component={MovieListScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <RootStack.Screen
+        name="MovieDetailsScreen"
+        component={MovieDetailsScreen}
         options={{
           headerShown: false,
         }}
