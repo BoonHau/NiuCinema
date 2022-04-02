@@ -12,7 +12,7 @@ import {SafeAreaView, Text, TextInput, View} from '../../shared/components/ui';
 import {StackScreenProps} from '@react-navigation/stack';
 import {RootStackParamList} from '../../shared/navigation';
 import {Colors} from '../../shared/constants';
-import {useColorScheme} from '../../shared/hook';
+import {useColorScheme, useDeviceOrientation} from '../../shared/hook';
 import {MovieListPlaceholder, MoviePosterItem} from './components';
 
 import {useAppDispatch, useAppSelector} from '../../shared/hook/useApp';
@@ -37,6 +37,9 @@ const MovieListScreen = ({navigation}: MovieListScreenProps) => {
 
   // Variable that holds top and bottom safe area insets
   const {top, bottom} = useSafeAreaInsets();
+
+  // Variable that holds orientation status
+  const orientation = useDeviceOrientation();
 
   // Variable that holds a new cached variable abortController in a useRef() hook
   const abortController = useRef<AbortController>();
@@ -82,9 +85,16 @@ const MovieListScreen = ({navigation}: MovieListScreenProps) => {
   // useEffect that
   // - stops the invocation of the debounced function after unmounting
   useEffect(() => {
+    const subscription = Dimensions.addEventListener('change', () => {
+      // setShouldRefresh(true);
+    });
+
     return () => {
       // Cancel debounced change handler
       debouncedChangeHandler.cancel();
+
+      // Remove dimensions listener
+      subscription.remove();
     };
   }, [debouncedChangeHandler]);
 
@@ -193,7 +203,10 @@ const MovieListScreen = ({navigation}: MovieListScreenProps) => {
               style={styles.body}
               numColumns={2}
               data={movieSearch.movies ?? []}
-              keyExtractor={item => item.imdbID}
+              keyExtractor={item =>
+                // Add
+                item.imdbID + orientation
+              }
               contentContainerStyle={{
                 paddingHorizontal: 20,
                 paddingVertical: 10,

@@ -35,9 +35,7 @@ export const MoviePosterItem = ({
           {isValidURL(item.Poster) ? (
             <Image
               style={{
-                resizeMode: 'cover',
-                width: '100%',
-                height: '100%',
+                flex: 1,
                 borderRadius: 12,
               }}
               source={{uri: item.Poster}}

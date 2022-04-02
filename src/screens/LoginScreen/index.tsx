@@ -72,11 +72,11 @@ const LoginScreen = ({navigation}: LoginScreenProps) => {
   // useFocusEffect that sets status bar style
   useFocusEffect(() => {
     if (Platform.OS === 'android') {
-      StatusBar.setBarStyle(
-        colorScheme === 'light' ? 'dark-content' : 'light-content',
-      );
       StatusBar.setBackgroundColor(Colors[colorScheme].background);
     }
+    StatusBar.setBarStyle(
+      colorScheme === 'light' ? 'dark-content' : 'light-content',
+    );
   });
 
   // useDidMountEffect that only tracks when the first render is done

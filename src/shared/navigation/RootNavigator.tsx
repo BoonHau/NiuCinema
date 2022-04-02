@@ -2,8 +2,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import React from 'react';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Feather from 'react-native-vector-icons/Feather';
-import {MovieListScreen, SplashScreen} from '../../screens';
-import MovieDetailsScreen from '../../screens/MovieDetailsScreen';
+import {MovieListScreen, MovieDetailsScreen} from '../../screens';
 import {AuthenticationNavigator} from './AuthenticationNavigator';
 import {View} from '../components/ui';
 import {Platform} from 'react-native';
@@ -50,13 +49,6 @@ export const RootNavigator = () => {
           </View>
         ),
       }}>
-      <RootStack.Screen
-        name="SplashScreen"
-        component={SplashScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
       <RootStack.Screen
         name="AuthenticationNavigator"
         component={AuthenticationNavigator}
