@@ -1,9 +1,10 @@
-/* eslint-disable react-native/no-inline-styles */
 import {
   Alert,
   ScrollView,
+  StatusBar,
   StyleSheet,
   TextInput as RNTextInput,
+  Platform,
 } from 'react-native';
 import React, {useRef, useState} from 'react';
 import {
@@ -25,7 +26,7 @@ import {signInWithUsernameAndPassword} from '../../services';
 import {batch} from 'react-redux';
 import {firebaseAuthActions} from '../../redux/slices';
 import {ActionTypes} from '../../redux';
-import {useIsFocused} from '@react-navigation/native';
+import {useFocusEffect, useIsFocused} from '@react-navigation/native';
 
 export type LoginScreenProps = StackScreenProps<
   AuthenticationStackParamList,
@@ -68,6 +69,16 @@ const LoginScreen = ({navigation}: LoginScreenProps) => {
   );
 
   // useEffect management
+  // useFocusEffect that sets status bar style
+  useFocusEffect(() => {
+    if (Platform.OS === 'android') {
+      StatusBar.setBarStyle(
+        colorScheme === 'light' ? 'dark-content' : 'light-content',
+      );
+      StatusBar.setBackgroundColor(Colors[colorScheme].background);
+    }
+  });
+
   // useDidMountEffect that only tracks when the first render is done
   useDidMountEffect(() => {
     // Check whether current scrren is focused
@@ -170,6 +181,7 @@ const LoginScreen = ({navigation}: LoginScreenProps) => {
               onChangeText={text => setUsername(text)}
               onFocus={() => setFocus('username')}
               onBlur={() => setFocus(undefined)}
+              placeholderTextColor={Colors[colorScheme].systemGray2}
               style={[
                 styles.txtInput,
                 {backgroundColor: Colors[colorScheme].systemGray6},
@@ -187,6 +199,7 @@ const LoginScreen = ({navigation}: LoginScreenProps) => {
               },
             ]}>
             <TextInput
+              refTextInput={refTextInputPassword}
               placeholder="Password"
               medium
               secureTextEntry
@@ -200,6 +213,7 @@ const LoginScreen = ({navigation}: LoginScreenProps) => {
                 setFocus('password');
               }}
               onBlur={() => setFocus(undefined)}
+              placeholderTextColor={Colors[colorScheme].systemGray2}
               style={[
                 styles.txtInput,
                 {backgroundColor: Colors[colorScheme].systemGray6},

@@ -12,7 +12,7 @@ import {
 } from '../Text/text.component';
 
 export type TextInputProps = {
-  ref?: LegacyRef<RNTextInput> | undefined;
+  refTextInput?: LegacyRef<RNTextInput> | undefined;
 } & RNTextInputProps &
   ThemeProps &
   StyledTextFontSizeProps &
@@ -22,7 +22,7 @@ export const TextInput = (
   props: TextInputProps,
 ): React.ReactElement<RNTextInput> => {
   // Get other text values
-  const {ref, style, ...rest} = props;
+  const {refTextInput, style, ...rest} = props;
 
   // Get font size
   const fontSize = getFontSize(props);
@@ -31,6 +31,10 @@ export const TextInput = (
   const fontFamily = getFontFamily(props);
 
   return (
-    <RNTextInput ref={ref} style={[{fontFamily, fontSize}, style]} {...rest} />
+    <RNTextInput
+      ref={refTextInput}
+      style={[{fontFamily, fontSize}, style]}
+      {...rest}
+    />
   );
 };

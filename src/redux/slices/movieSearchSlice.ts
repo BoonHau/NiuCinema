@@ -5,7 +5,7 @@ import {ActionTypes} from '../actionTypes';
 
 export interface MovieSearchState {
   status: ActionTypes;
-  error: Error | undefined;
+  error?: Error | undefined;
   movies?: Search[] | undefined;
   totalResults?: string | undefined;
 }
@@ -49,3 +49,5 @@ export const movieSearchSlice = createSlice({
     });
   },
 });
+
+export const movieSearchActions = movieSearchSlice.actions;

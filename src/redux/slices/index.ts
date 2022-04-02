@@ -4,6 +4,25 @@ import {
   firebaseAuthActions,
 } from './firebaseAuthSlice';
 
-export {firebaseAuthSlice, firebaseAuthActions};
+import {
+  MovieDetailsState,
+  movieDetailsSlice,
+  movieDetailsActions,
+} from './movieDetailsSlice';
 
-export type {FirebaseAuthState};
+import {
+  MovieSearchState,
+  movieSearchSlice,
+  movieSearchActions,
+} from './movieSearchSlice';
+
+export {
+  firebaseAuthSlice,
+  firebaseAuthActions,
+  movieDetailsSlice,
+  movieDetailsActions,
+  movieSearchSlice,
+  movieSearchActions,
+};
+
+export type {FirebaseAuthState, MovieDetailsState, MovieSearchState};

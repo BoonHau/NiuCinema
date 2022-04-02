@@ -1,16 +1,26 @@
-import {Image, StyleSheet} from 'react-native';
+import {Image, Pressable, StyleSheet} from 'react-native';
 import React from 'react';
 import {Search} from '../../../model';
 import LinearGradient from 'react-native-linear-gradient';
 import {Colors} from '../../../shared/constants';
 import {Text, View} from '../../../shared/components/ui';
+import {isValidURL} from '../../../utils';
+import {useColorScheme} from '../../../shared/hook';
 
 export type MoviePosterItemProps = {
   index: number;
   item: Search;
+  onPressPoster: () => void;
 };
 
-export const MoviePosterItem = ({index, item}: MoviePosterItemProps) => {
+export const MoviePosterItem = ({
+  index,
+  item,
+  onPressPoster,
+}: MoviePosterItemProps) => {
+  // Variable that holds useColorScheme hook
+  const colorScheme = useColorScheme();
+
   return (
     <View
       style={[
@@ -20,26 +30,45 @@ export const MoviePosterItem = ({index, item}: MoviePosterItemProps) => {
           marginStart: index % 2 === 0 ? 0 : 10,
         },
       ]}>
-      <View style={styles.vwMoviePoster}>
-        <Image
-          style={{flex: 1, borderRadius: 12}}
-          source={{uri: item.Poster}}
-          resizeMode="cover"
-        />
-        <View style={styles.vwMoviePosterContent}>
-          <LinearGradient
-            style={{flex: 1}}
-            colors={[Colors.transparent, Colors.black]}
-          />
-          <Text
-            medium
-            caption1
-            style={styles.txtMoviePosterTitle}
-            numberOfLines={2}>
-            {item.Title}
-          </Text>
+      <Pressable onPress={onPressPoster}>
+        <View style={styles.vwMoviePoster}>
+          {isValidURL(item.Poster) ? (
+            <Image
+              style={{
+                resizeMode: 'cover',
+                width: '100%',
+                height: '100%',
+                borderRadius: 12,
+              }}
+              source={{uri: item.Poster}}
+            />
+          ) : (
+            <></>
+          )}
+          <View style={styles.vwMoviePosterContent}>
+            <LinearGradient
+              style={{flex: 1}}
+              colors={
+                colorScheme === 'light'
+                  ? [Colors.transparent, Colors.transparent, Colors.black]
+                  : [
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.primaryColor,
+                    ]
+              }
+            />
+            <Text
+              medium
+              caption1
+              style={styles.txtMoviePosterTitle}
+              numberOfLines={2}>
+              {item.Title}
+            </Text>
+          </View>
         </View>
-      </View>
+      </Pressable>
     </View>
   );
 };

@@ -1,2 +1,3 @@
 export * from './User';
-export * from './MovieSearch';
+export * from './GetMoviesResponseModel';
+export * from './GetMovieDetailsResponseModel';

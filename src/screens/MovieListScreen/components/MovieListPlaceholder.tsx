@@ -9,34 +9,25 @@ const MovieListPlaceholder = () => {
       data={new Array(6)}
       renderItem={() => (
         <SkeletonPlaceholder>
-          <SkeletonPlaceholder.Item
-            flexDirection="row"
-            minHeight={200}
-            alignItems="center">
-            <SkeletonPlaceholder.Item width={'50%'} paddingEnd={10}>
+          <SkeletonPlaceholder.Item flexDirection="row" alignItems="center">
+            <SkeletonPlaceholder.Item
+              width={'50%'}
+              paddingEnd={10}
+              marginVertical={10}>
               <SkeletonPlaceholder.Item
                 width={'100%'}
-                height={180}
-                borderRadius={4}
-              />
-              <SkeletonPlaceholder.Item
-                width={'100%'}
-                height={20}
-                borderRadius={4}
-                marginVertical={10}
+                borderRadius={12}
+                aspectRatio={4 / 6}
               />
             </SkeletonPlaceholder.Item>
-            <SkeletonPlaceholder.Item width={'50%'} paddingStart={10}>
+            <SkeletonPlaceholder.Item
+              width={'50%'}
+              paddingStart={10}
+              marginVertical={10}>
               <SkeletonPlaceholder.Item
                 width={'100%'}
-                height={180}
-                borderRadius={4}
-              />
-              <SkeletonPlaceholder.Item
-                width={'100%'}
-                height={20}
-                borderRadius={4}
-                marginVertical={10}
+                borderRadius={12}
+                aspectRatio={4 / 6}
               />
             </SkeletonPlaceholder.Item>
           </SkeletonPlaceholder.Item>

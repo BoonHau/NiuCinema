@@ -1,7 +1,8 @@
 export interface GetMoviesResponseModel {
-  Search: Search[];
-  totalResults: string;
+  Search: Search[] | undefined;
+  totalResults: string | undefined;
   Response: string;
+  Error: string | undefined;
 }
 
 export interface Search {

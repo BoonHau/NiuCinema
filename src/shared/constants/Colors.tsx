@@ -1,5 +1,6 @@
 export default {
-  primaryColor: '#0660DB',
+  primaryColor: '#125FDC',
+  primaryVariantColor: '#C1D6F4',
   white: 'white',
   black: 'black',
   transparent: 'transparent',
@@ -33,8 +34,8 @@ export default {
   dark: {
     background: '#000000',
 
-    primaryTextColor: '#37405C',
-    secondaryTextColor: '#7789B5',
+    primaryTextColor: '#EBEBEE',
+    secondaryTextColor: '#F1F3F7',
 
     systemGray: 'rgb(142, 142, 147)',
     systemGray2: 'rgb(99, 99, 102)',

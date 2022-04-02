@@ -1,7 +1,8 @@
-/* eslint-disable react-native/no-inline-styles */
 import {
   Alert,
+  Platform,
   ScrollView,
+  StatusBar,
   StyleSheet,
   TextInput as RNTextInput,
 } from 'react-native';
@@ -22,6 +23,7 @@ import {useAppDispatch, useAppSelector} from '../../shared/hook/useApp';
 import signUpWithUsernameAndPassword from '../../services/signUpWithUsernameAndPassword';
 import {ActionTypes, firebaseAuthActions} from '../../redux';
 import {batch} from 'react-redux';
+import {useFocusEffect} from '@react-navigation/native';
 
 export type SignUpScreenProps = StackScreenProps<
   AuthenticationStackParamList,
@@ -69,6 +71,16 @@ const SignUpScreen = ({navigation}: SignUpScreenProps) => {
   >(undefined);
 
   // useEffect management
+  // useFocusEffect that sets status bar style
+  useFocusEffect(() => {
+    if (Platform.OS === 'android') {
+      StatusBar.setBarStyle(
+        colorScheme === 'light' ? 'dark-content' : 'light-content',
+      );
+      StatusBar.setBackgroundColor(Colors[colorScheme].background);
+    }
+  });
+
   // useDidMountEffect that only tracks when the first render is done
   useDidMountEffect(() => {
     // Firebase authentication state handler
@@ -164,6 +176,7 @@ const SignUpScreen = ({navigation}: SignUpScreenProps) => {
               onChangeText={text => setUsername(text)}
               onFocus={() => setFocus('email')}
               onBlur={() => setFocus(undefined)}
+              placeholderTextColor={Colors[colorScheme].systemGray2}
               style={[
                 styles.txtInput,
                 {backgroundColor: Colors[colorScheme].systemGray6},
@@ -181,7 +194,7 @@ const SignUpScreen = ({navigation}: SignUpScreenProps) => {
               },
             ]}>
             <TextInput
-              ref={refTextInputPassword}
+              refTextInput={refTextInputPassword}
               placeholder="Password"
               medium
               secureTextEntry
@@ -193,6 +206,7 @@ const SignUpScreen = ({navigation}: SignUpScreenProps) => {
                 refTextInputConfirmPassword.current?.focus()
               }
               onChangeText={text => setPassword(text)}
+              placeholderTextColor={Colors[colorScheme].systemGray2}
               onFocus={() => {
                 setFocus('password');
               }}
@@ -214,7 +228,7 @@ const SignUpScreen = ({navigation}: SignUpScreenProps) => {
               },
             ]}>
             <TextInput
-              ref={refTextInputConfirmPassword}
+              refTextInput={refTextInputConfirmPassword}
               placeholder="Confirm Password"
               medium
               secureTextEntry
@@ -223,6 +237,7 @@ const SignUpScreen = ({navigation}: SignUpScreenProps) => {
               selectionColor={Colors.primaryColor}
               defaultValue={strConfirmPassword}
               onChangeText={text => setConfirmPassword(text)}
+              placeholderTextColor={Colors[colorScheme].systemGray2}
               onFocus={() => {
                 setFocus('confirm-password');
               }}
