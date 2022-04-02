@@ -23,11 +23,11 @@ const AuthenticationScreen = ({navigation}: AuthenticationScreenProps) => {
   // useFocusEffect that sets status bar style
   useFocusEffect(() => {
     if (Platform.OS === 'android') {
-      StatusBar.setBarStyle(
-        colorScheme === 'light' ? 'dark-content' : 'light-content',
-      );
       StatusBar.setBackgroundColor(Colors[colorScheme].background);
     }
+    StatusBar.setBarStyle(
+      colorScheme === 'light' ? 'dark-content' : 'light-content',
+    );
   });
 
   return (
