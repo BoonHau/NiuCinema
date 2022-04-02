@@ -1,6 +1,6 @@
 import MovieListPlaceholder from './MovieListPlaceholder';
-import {MoviePosterItem, MoviePosterItemProps} from './MoviePosterItem';
+import {MovieListItem, MovieListItemProps} from './MovieListItem';
 
-export {MovieListPlaceholder, MoviePosterItem};
+export {MovieListPlaceholder, MovieListItem};
 
-export type {MoviePosterItemProps};
+export type {MovieListItemProps};

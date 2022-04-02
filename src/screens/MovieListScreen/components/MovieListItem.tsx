@@ -7,17 +7,17 @@ import {Text, View} from '../../../shared/components/ui';
 import {isValidURL} from '../../../utils';
 import {useColorScheme} from '../../../shared/hook';
 
-export type MoviePosterItemProps = {
+export type MovieListItemProps = {
   index: number;
   item: Search;
   onPressPoster: () => void;
 };
 
-export const MoviePosterItem = ({
+export const MovieListItem = ({
   index,
   item,
   onPressPoster,
-}: MoviePosterItemProps) => {
+}: MovieListItemProps) => {
   // Variable that holds useColorScheme hook
   const colorScheme = useColorScheme();
 

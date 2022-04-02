@@ -6,7 +6,7 @@ import {
   TextInput as RNTextInput,
   Platform,
 } from 'react-native';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   Button,
   SafeAreaView,
@@ -15,7 +15,7 @@ import {
   View,
 } from '../../shared/components/ui';
 import {Colors, Layout} from '../../shared/constants';
-import {useColorScheme, useDidMountEffect} from '../../shared/hook';
+import {useColorScheme} from '../../shared/hook';
 import {StackScreenProps} from '@react-navigation/stack';
 import {AuthenticationStackParamList} from '../../shared/navigation';
 import {TouchableOpacity} from 'react-native-gesture-handler';
@@ -71,6 +71,7 @@ const LoginScreen = ({navigation}: LoginScreenProps) => {
   // useEffect management
   // useFocusEffect that sets status bar style
   useFocusEffect(() => {
+    // For android only
     if (Platform.OS === 'android') {
       StatusBar.setBackgroundColor(Colors[colorScheme].background);
     }
@@ -80,10 +81,9 @@ const LoginScreen = ({navigation}: LoginScreenProps) => {
   });
 
   // useDidMountEffect that only tracks when the first render is done
-  useDidMountEffect(() => {
-    // Check whether current scrren is focused
+  useEffect(() => {
+    // Do nothing if is not focus
     if (!isFocused) {
-      // Do nothing if is not focused
       return;
     }
 
@@ -136,7 +136,14 @@ const LoginScreen = ({navigation}: LoginScreenProps) => {
       default:
         break;
     }
-  }, [firebaseAuth.user, firebaseAuth.error]);
+  }, [
+    firebaseAuth.status,
+    firebaseAuth.user,
+    firebaseAuth.error,
+    dispatch,
+    navigation,
+    isFocused,
+  ]);
 
   return (
     <SafeAreaView

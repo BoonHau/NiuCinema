@@ -1,30 +1,23 @@
 import {
-  Dimensions,
   FlatList,
-  Image,
   Keyboard,
   Platform,
   StatusBar,
   StyleSheet,
 } from 'react-native';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {SafeAreaView, Text, TextInput, View} from '../../shared/components/ui';
+import {SafeAreaView, TextInput, View} from '../../shared/components/ui';
 import {StackScreenProps} from '@react-navigation/stack';
 import {RootStackParamList} from '../../shared/navigation';
 import {Colors} from '../../shared/constants';
 import {useColorScheme, useDeviceOrientation} from '../../shared/hook';
-import {MovieListPlaceholder, MoviePosterItem} from './components';
-
+import {MovieListPlaceholder, MovieListItem} from './components';
 import {useAppDispatch, useAppSelector} from '../../shared/hook/useApp';
 import {getMovies} from '../../services';
 import {ActionTypes, movieSearchActions} from '../../redux';
-import {batch} from 'react-redux';
 import {debounce} from 'lodash';
 import {useFocusEffect} from '@react-navigation/native';
-import {ScrollView} from 'react-native-gesture-handler';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-
-const {height} = Dimensions.get('window');
+import {ErrorView} from '../../shared/components/ui/ErrorView';
 
 export type MovieListScreenProps = StackScreenProps<
   RootStackParamList,
@@ -34,9 +27,6 @@ export type MovieListScreenProps = StackScreenProps<
 const MovieListScreen = ({navigation}: MovieListScreenProps) => {
   // Variable that holds useColorScheme hook
   const colorScheme = useColorScheme();
-
-  // Variable that holds top and bottom safe area insets
-  const {top, bottom} = useSafeAreaInsets();
 
   // Variable that holds orientation status
   const orientation = useDeviceOrientation();
@@ -82,19 +72,11 @@ const MovieListScreen = ({navigation}: MovieListScreenProps) => {
     );
   });
 
-  // useEffect that
-  // - stops the invocation of the debounced function after unmounting
+  // useEffect that stops the invocation of the debounced function after unmounting
   useEffect(() => {
-    const subscription = Dimensions.addEventListener('change', () => {
-      // setShouldRefresh(true);
-    });
-
     return () => {
       // Cancel debounced change handler
       debouncedChangeHandler.cancel();
-
-      // Remove dimensions listener
-      subscription.remove();
     };
   }, [debouncedChangeHandler]);
 
@@ -110,20 +92,14 @@ const MovieListScreen = ({navigation}: MovieListScreenProps) => {
 
       // Api status is failure
       case ActionTypes.REQUEST_FAILED:
-        // Modify state in a single render update
-        batch(() => {
-          // Dismiss loading indicator when calling api
-          setLoading(false);
-        });
+        // Dismiss loading indicator when calling api
+        setLoading(false);
         break;
 
       // Api status is succeded
       case ActionTypes.REQUEST_SUCCEEDED:
-        // Modify state in a single render update
-        batch(() => {
-          // Dismiss loading indicator when calling api
-          setLoading(false);
-        });
+        // Dismiss loading indicator when calling api
+        setLoading(false);
         break;
 
       default:
@@ -193,81 +169,62 @@ const MovieListScreen = ({navigation}: MovieListScreenProps) => {
           />
         </View>
       </View>
-      {isLoading ? (
-        <MovieListPlaceholder />
-      ) : (
-        <View style={{flex: 1}}>
-          {movieSearch.movies && movieSearch.movies.length > 0 ? (
-            <FlatList
-              keyboardShouldPersistTaps="handled"
-              style={styles.body}
-              numColumns={2}
-              data={movieSearch.movies ?? []}
-              keyExtractor={item =>
-                // Add
-                item.imdbID + orientation
-              }
-              contentContainerStyle={{
-                paddingHorizontal: 20,
-                paddingVertical: 10,
-              }}
-              renderItem={({item, index}) => (
-                <MoviePosterItem
-                  index={index}
-                  item={item}
-                  onPressPoster={() => {
-                    // Navigate to movie details screen with an id
-                    navigation.navigate('MovieDetailsScreen', {
-                      id: item.imdbID,
-                    });
+      {
+        <View style={styles.body}>
+          {
+            // Display loading if needed
+            isLoading ? (
+              <MovieListPlaceholder />
+            ) : // Display error message if needed
+            movieSearch.error ? (
+              <ErrorView
+                imageSource={require('../../assets/images/bg_no_data.png')}
+                title={movieSearch.error.message}
+              />
+            ) : // Display movie list
+            movieSearch.movies === undefined ||
+              movieSearch.movies?.length === 0 ? (
+              <ErrorView
+                imageSource={require('../../assets/images/bg_no_data.png')}
+                title={'Movie not found.'}
+                onPress={() => Keyboard.dismiss()}
+              />
+            ) : (
+              <FlatList
+                style={styles.body}
+                numColumns={2}
+                data={movieSearch.movies ?? []}
+                keyExtractor={item =>
+                  // Append orientation to prevent android rendering issue
+                  item.imdbID + orientation
+                }
+                contentContainerStyle={{
+                  paddingHorizontal: 20,
+                  paddingVertical: 10,
+                }}
+                renderItem={({item, index}) => (
+                  <MovieListItem
+                    index={index}
+                    item={item}
+                    onPressPoster={() => {
+                      // Navigate to movie details screen with an id
+                      navigation.navigate('MovieDetailsScreen', {
+                        id: item.imdbID,
+                      });
 
-                    // Dismiss keyboard
-                    Keyboard.dismiss();
+                      // Dismiss keyboard
+                      Keyboard.dismiss();
 
-                    // Clear focus
-                    setSearchFocused(false);
-                  }}
-                />
-              )}
-            />
-          ) : (
-            <ScrollView style={styles.container} bounces={false}>
-              <View style={{minHeight: height - 65 - top - bottom}}>
-                <View style={{flex: 0.5, padding: 20}}>
-                  <Image
-                    style={{flex: 1, width: undefined, height: undefined}}
-                    source={require('../../assets/images/bg_no_data.png')}
-                    resizeMode="contain"
+                      // Clear focus
+                      setSearchFocused(false);
+                    }}
                   />
-                </View>
-                <View style={{flex: 0.5}}>
-                  {movieSearch.error?.message && (
-                    <Text
-                      bold
-                      h4
-                      style={{
-                        color: Colors.primaryColor,
-                        textAlign: 'center',
-                        paddingHorizontal: 20,
-                        marginBottom: 20,
-                      }}>
-                      {
-                        // Return error message if any
-                        movieSearch.error?.message
-                          ? movieSearch.error?.message
-                          : // Return no movies found if movie list is empty
-                          movieSearch.movies?.length === 0
-                          ? 'No movies found.'
-                          : 'Oops! Something went wrong. Please try later.'
-                      }
-                    </Text>
-                  )}
-                </View>
-              </View>
-            </ScrollView>
-          )}
+                )}
+              />
+            )
+          }
         </View>
-      )}
+      }
     </SafeAreaView>
   );
 };
