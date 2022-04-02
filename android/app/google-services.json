@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "841094385505",
+    "project_id": "niucinema",
+    "storage_bucket": "niucinema.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:841094385505:android:0cef37c6c97e6480587f20",
+        "android_client_info": {
+          "package_name": "com.niucinema"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "841094385505-hi3a0ahnd2rjvhipob6tqgcvsplmeha2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNHMhKuPr_bAhzCEKobMYBve1T87hI74g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "841094385505-hi3a0ahnd2rjvhipob6tqgcvsplmeha2.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "841094385505-lg1d6bju823f7erqq4d7rumfaqtnfjk7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.reactjs.native.example.NiuCinema"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
